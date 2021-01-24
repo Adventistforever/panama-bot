@@ -105,7 +105,7 @@ async def on_message(message):
 			l.log(account)
 			await ml.log("They have {1.currency}{0.amount}".format(account,param))
 		except Document.DoesNotExist:
-			await ml.log("They don't have an account.")
+			await ml.log("They don't have an account yet.")
 	
 	async def help(text):
 		param = db.get(ServerSettings,{'guild_id' : server.id})
@@ -308,7 +308,6 @@ Change with (example) : `{0.prefix} set cooldown 60`
 				account.last_update = time.time()
 				account.save()
 		except Document.DoesNotExist:
-			await ml.log("Welcome to the economy !")
 			await money(text)
 	lock = False
 	db.commit()
