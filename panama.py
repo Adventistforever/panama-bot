@@ -257,6 +257,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 				price[item.name] = item.price
 			pick = await menu(dic)
 			if pick is not None:
+				print(price[item.name])
 				if account.amount > price[item.name]:
 					account.amount -= price[item.name]
 					await author.add_roles(server.get_role(item.role))
@@ -311,7 +312,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			await money(text)
 	lock = False
 	db.commit()
-	
-bot.run(os.environ["PANAMA"])
 
-# https://discord.com/oauth2/authorize?&client_id=801706530536947722&scope=bot&permissions=268553216
+bot.run(os.environ["PANAMA"])
+# PANAMA TEST https://discord.com/oauth2/authorize?&client_id=802926388235337759&scope=bot&permissions=268553216
+# PANAMA https://discord.com/oauth2/authorize?&client_id=801706530536947722&scope=bot&permissions=268553216
