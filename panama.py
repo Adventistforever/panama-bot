@@ -68,6 +68,8 @@ async def on_message(message):
 		"cooldown":30
 		},backend=db)
 		param.save()
+		db.commit()
+
 	
 	async def ping(text):
 		await ml.log("teehee !")
@@ -311,6 +313,6 @@ Change with (example) : `{0.prefix} set cooldown 60`
 	lock = False
 	db.commit()
 	
-bot.run(os.getenv("PANAMA_BOT_TOKEN"))
+bot.run(os.environ["PANAMA"])
 
 # https://discord.com/oauth2/authorize?&client_id=801706530536947722&scope=bot&permissions=268553216
