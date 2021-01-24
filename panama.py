@@ -312,6 +312,6 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		lock = False
 		db.commit()
 	
-bot.run("ODAxNzA2NTMwNTM2OTQ3NzIy.YAklYw.JkF1wbemdgXkxEe9QRRM3drhdw8")
+bot.run(os.getenv("PANAMA_BOT_TOKEN"))
 
 # https://discord.com/oauth2/authorize?&client_id=801706530536947722&scope=bot&permissions=268553216
