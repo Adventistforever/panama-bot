@@ -252,10 +252,8 @@ Change with (example) : `{0.prefix} set cooldown 60`
 						l.log(ftpDir + fname + " is created.")
 						download_dir(ftpDir + fname + "/", localDir + fname + "/")
 					else:               
-						if(ftp_host.download_if_newer(ftpDir + fname, localDir + fname)):
-							l.log(localDir + fname + " is downloaded.")
-						else:
-							l.log(ftpDir + fname + " has already been downloaded.")
+						ftp_host.download(ftpDir + fname, localDir + fname)
+						l.log(localDir + fname + " is downloaded.")
 			local_dir = "./db/"
 			ftp_dir = "/panama/db/"
 
