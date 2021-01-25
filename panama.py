@@ -17,7 +17,7 @@ from blitzdb import FileBackend
 import ftptool
 db = FileBackend("./db", {'serializer_class': 'json'})
 a_host = ftptool.FTPHost.connect("ftp-mike1844.alwaysdata.net", user="mike1844_panama", password=os.environ["PANAMA"])
-a_host.current_directory = "/app"
+a_host.current_directory = "/"
 
 class ServerSettings(Document):
 	class Meta(Document.Meta):
@@ -219,11 +219,11 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			return None
 	
 	async def save(text):
-		a_host.mirror_to_remote('/db', '/db')
+		a_host.mirror_to_remote('/db', './db')
 		await ml.log("nice.")
 	
 	async def load(text):
-		a_host.mirror_to_local('/db', '/db')
+		a_host.mirror_to_local('/db', './db')
 		await ml.log("nice.")
 	
 	async def create(text):
