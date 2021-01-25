@@ -17,6 +17,7 @@ from blitzdb import FileBackend
 import ftptool
 db = FileBackend("./db", {'serializer_class': 'json'})
 a_host = ftptool.FTPHost.connect("ftp-mike1844.alwaysdata.net", user="mike1844_panama", password=os.environ["PANAMA"])
+a_host.current_directory = "/app"
 
 class ServerSettings(Document):
 	class Meta(Document.Meta):
