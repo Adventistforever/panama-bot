@@ -16,8 +16,8 @@ import random # random
 import mikedb
 import ftputil
 import pickle
-from blitzdb import Document
-from blitzdb import FileBackend
+# from blitzdb import Document
+# from blitzdb import FileBackend
 # db = FileBackend("./db", {'serializer_class': 'json'})
 with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
 	acc_db = mikedb.MikeDB.load(ftp_host,"/panama/acc_data","account_and_server_settings")
