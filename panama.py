@@ -6,8 +6,7 @@ PREFIX = "p!"
 bot = commands.Bot(command_prefix=PREFIX)
 import magic_log
 import asyncio
-import os 
-import shutil
+import os # to restart the bot
 import sys # to restart the bot
 import traceback # because why not
 import time # cooldown
@@ -223,11 +222,10 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			def upload_dir(localDir, ftpDir):
 				list = os.listdir(localDir)
 				for fname in list:
-					if os.path.isdir(localDir + fname):
-						if ftp_host.exists(ftpDir + fname):
-							ftp_host.rmtree(ftpDir + fname)
+					if os.path.isdir(localDir + fname):             
+						if(ftp_host.path.exists(ftpDir + fname) != True):                   
 							ftp_host.mkdir(ftpDir + fname)
-						l.log(ftpDir + fname + " is created.")
+							l.log(ftpDir + fname + " is created.")
 						upload_dir(localDir + fname + "/", ftpDir + fname + "/")
 					else:               
 						if(ftp_host.upload_if_newer(localDir + fname, ftpDir + fname)):
@@ -244,16 +242,19 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
 			def download_dir(ftpDir, localDir):
 				list = ftp_host.listdir(ftpDir)
+				shutil.rmtree(localDir)
+				os.mkdir(localDir)
 				for fname in list:
-					if ftp_host.path.isdir(ftpDir + fname):
-						if os.path.exists(localDir + fname):
-							shutil.rmtree(localDir + fname)
+					if ftp_host.path.isdir(ftpDir + fname):             
+						if(os.path.exists(localDir + fname) != True):                   
 							os.mkdir(localDir + fname)
-						l.log(ftpDir + fname + " is created.")
+							l.log(localDir + fname + " is created.")
 						download_dir(ftpDir + fname + "/", localDir + fname + "/")
-					else:               
-						ftp_host.download(ftpDir + fname, localDir + fname)
-						l.log(localDir + fname + " is downloaded.")
+					else:
+						if(ftp_host.download_if_newer(ftpDir + fname, localDir + fname)):
+							l.log(localDir + fname + " is downloaded.")
+						else:
+							l.log(ftpDir + fname + " has already been downloaded.")
 			local_dir = "./db/"
 			ftp_dir = "/panama/db/"
 
