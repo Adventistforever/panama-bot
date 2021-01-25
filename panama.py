@@ -13,10 +13,15 @@ import traceback # because why not
 import time # cooldown
 import random # random
 
+import mikedb
+import ftputil
+import pickle
 from blitzdb import Document
 from blitzdb import FileBackend
-import ftputil
-db = FileBackend("./db", {'serializer_class': 'json'})
+# db = FileBackend("./db", {'serializer_class': 'json'})
+with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
+	acc_db = mikedb.MikeDB.load(ftp_host,"/panama/acc_data","account_and_server_settings")
+	item_db = mikedb.MikeDB.load(ftp_host,"/panama/item_data","items")
 
 
 class ServerSettings(Document):
@@ -24,6 +29,9 @@ class ServerSettings(Document):
 		primary_key = 'guild_id' #use the guild_id of the author as the primary key
 
 class BankAccount(Document):
+	def __init__(self, attributes=None, lazy=False, backend=None, autoload=True, db_loader=None):
+		super().__init__(attributes, lazy, backend, autoload, db_loader)
+			
 	class Meta(Document.Meta):
 		collection = 'accounts'
 
@@ -41,7 +49,7 @@ lock = False
 @bot.event
 async def on_message(message):
 	global lock
-	l = magic_log.Print()
+	l = magic_log.NoLog()
 	ml = magic_log.MessageLog()
 	l.log(message.content)
 
@@ -60,9 +68,12 @@ async def on_message(message):
 		return
 	
 	try:
-		param = db.get(ServerSettings,{'guild_id' : server.id})
-	except Document.DoesNotExist:
-		param = ServerSettings(
+		param = acc_db.get("settings",server.id)
+	except mikedb.NoSuchCollectionError:
+		acc_db.put_collection("settings")
+		param = None
+	if not param :
+		param = acc_db.put("settings",server.id,
 		{"guild_id":server.id,
 		"currency":"💰",
 		"prefix":"pan",
@@ -70,11 +81,9 @@ async def on_message(message):
 		"gain":10,
 		"variation":20,
 		"cooldown":30
-		},backend=db)
-		param.save()
-		db.commit()
-
-	
+		})
+	l.log(acc_db)
+		
 	async def ping(text):
 		await ml.log("teehee !")
 		await ml.log(author.permissions_in(channel))
@@ -84,35 +93,36 @@ async def on_message(message):
 		os.execv(sys.executable, ['python'] + sys.argv)
 	
 	async def money(text):
-		param = db.get(ServerSettings,{'guild_id' : server.id})
+		param = acc_db.get("settings",server.id)
+		
 		try:
-			account = db.get(BankAccount,{'guild_id' : server.id, 'user_id' : author.id})
-			l.log(account)
-			account.save()
-		except Document.DoesNotExist:
+			account = acc_db.get(server.id,author.id)
+		except mikedb.NoSuchCollectionError:
+			acc_db.put_collection(server.id)
+			account = None
+		
+		if not account:
 			await ml.log("Welcome to the economy !")
-			account = BankAccount({
+			account = acc_db.put(server.id,author.id,{
 				"guild_id":server.id,
 				"user_id":author.id,
 				"amount":int(param.default_amount),
 				"last_update":time.time()
-			},backend=db)
-			account.last_update = time.time()
-			account.save()
-			l.log(account)
+			})
+
+		l.log(account)
 		await ml.log("You have {1.currency}{0.amount}".format(account,param))
 		
 	async def money_other(text):
-		param = db.get(ServerSettings,{'guild_id' : server.id})
-		try:
-			account = db.get(BankAccount,{'guild_id' : server.id, 'user_id' : message.mentions[0].id})
-			l.log(account)
-			await ml.log("They have {1.currency}{0.amount}".format(account,param))
-		except Document.DoesNotExist:
+		param = acc_db.get("settings",server.id)
+		account = acc_db.get(server.id,message.mentions[0].id)
+		if not account:
 			await ml.log("They don't have an account yet.")
+		l.log(account)
+		await ml.log("They have {1.currency}{0.amount}".format(account,param))
 	
 	async def help(text):
-		param = db.get(ServerSettings,{'guild_id' : server.id})
+		param = acc_db.get("settings",server.id)
 		await ml.log("""
 ```YOU GET MONEY FROM CHATTING HERE.```
 ```BASICS```
@@ -125,10 +135,11 @@ async def on_message(message):
 ```MOD```
 **Customize your life** `{0.prefix} settings`
 **Create stuff to buy, or jobs** `{0.prefix} create`
+**Set the money of someone or yourself :joy:** `{0.prefix} set_money @someone`
 		""".format(param))
 	
 	async def settings(text):
-		param = db.get(ServerSettings,{'guild_id' : server.id})
+		param = acc_db.get("settings",server.id)
 		await ml.log("""
 ```BASICS```
 **Prefix** : {0.prefix}
@@ -148,11 +159,9 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		
 	async def set(text):
 		if (channel is discord.DMChannel or author.guild_permissions.manage_messages):
-			param = db.get(ServerSettings,{'guild_id' : server.id})
+			param = acc_db.get("settings",server.id)
 			try:
-				parameters = param.attributes
-				parameters[text[2]] = text[3]
-				param = ServerSettings(parameters,backend=db)
+				param[text[2]] = text[3]
 				param.save()
 				await ml.log("New saved value : {0}".format(text[3]))
 			except Exception:
@@ -162,24 +171,23 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			await ml.log("You don't have permissions ._.")
 	
 	async def give(text):
-		param = db.get(ServerSettings,{'guild_id' : server.id})
-		account = db.get(BankAccount,{'guild_id' : server.id, 'user_id' : author.id})
+		param = acc_db.get("settings",server.id)
+		account = acc_db.get(server.id, author.id)
 		try:
-			try:
-				fellow_acc = db.get(BankAccount,{'guild_id' : server.id, 'user_id' : message.mentions[0].id})
-			except Document.DoesNotExist :
-				fellow_acc = BankAccount({
+			fellow_acc = acc_db.get(server.id, message.mentions[0].id)
+			if not fellow_acc:
+				fellow_acc = acc_db.put(server.id,author.id,{
 					"guild_id":server.id,
-					"user_id":message.mentions[0].id,
+					"user_id":author.id,
 					"amount":int(param.default_amount),
 					"last_update":time.time()
-				},backend=db)
+				})
 				fellow_acc.save()
-				l.log(fellow_acc)
+				l.force_p(fellow_acc)
 			amount = [int(i) for i in text if i.isdigit()][0]
 			l.force_p(amount)
-			fellow_acc.amount += int(amount)
-			account.amount -= int(amount)
+			account["amount"] = account["amount"] - int(amount)
+			fellow_acc["amount"] = fellow_acc["amount"] + int(amount)
 			account.save()
 			fellow_acc.save()
 			await ml.log("{0}{1} goes to your buddy !".format(param.currency,amount))
@@ -219,56 +227,41 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			return None
 	
 	async def save(text):
-		with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
-			def upload_dir(localDir, ftpDir):
-				list = os.listdir(localDir)
-				if ftp_host.path.exists(ftpDir):
-					ftp_host.rmtree(ftpDir)
-					ftp_host.mkdir(ftpDir[:-1])
-				for fname in list:
-					if os.path.isdir(localDir + fname):             
-						if(ftp_host.path.exists(ftpDir + fname) != True):                   
-							ftp_host.mkdir(ftpDir + fname)
-							l.log(ftpDir + fname + " is created.")
-						upload_dir(localDir + fname + "/", ftpDir + fname + "/")
-					else:               
-						if(ftp_host.upload_if_newer(localDir + fname, ftpDir + fname)):
-							l.log(ftpDir + fname + " is uploaded.")
-						else:
-							l.log(localDir + fname + " has already been uploaded.")
-			local_dir = "./db/"
-			ftp_dir = "/panama/db/"
-
-			upload_dir(local_dir, ftp_dir)
 		await ml.log("nice.")
 	
 	async def load(text):
-		with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
-			def download_dir(ftpDir, localDir):
-				list = ftp_host.listdir(ftpDir)
-				if (os.path.exists(localDir)):
-					shutil.rmtree(localDir)
-					os.mkdir(localDir[:-1])
-				for fname in list:
-					if ftp_host.path.isdir(ftpDir + fname):             
-						if(os.path.exists(localDir + fname) != True):                   
-							os.mkdir(localDir + fname)
-							l.log(localDir + fname + " is created.")
-						download_dir(ftpDir + fname + "/", localDir + fname + "/")
-					else:
-						if(ftp_host.download_if_newer(ftpDir + fname, localDir + fname)):
-							l.log(localDir + fname + " is downloaded.")
-						else:
-							l.log(ftpDir + fname + " has already been downloaded.")
-			local_dir = "./db/"
-			ftp_dir = "/panama/db/"
-
-			download_dir(ftp_dir, local_dir)
 		await ml.log("nice.")
 	
+	async def set_money(text):
+		param = acc_db.get("settings",server.id)
+		account = acc_db.get(server.id, author.id)
+		if (author.guild_permissions.manage_guild):
+			try:
+				fellow_acc = acc_db.get(server.id, message.mentions[0].id)
+				if not fellow_acc:
+					fellow_acc = acc_db.put(server.id,author.id,{
+						"guild_id":server.id,
+						"user_id":author.id,
+						"amount":int(param.default_amount),
+						"last_update":time.time()
+					})
+					fellow_acc.save()
+					l.force_p(fellow_acc)
+				amount = [int(i) for i in text if i.isdigit()][0]
+				l.force_p(amount)
+				fellow_acc["amount"] = int(amount)
+				fellow_acc.save()
+				await ml.log("{0}{1} is now their balance !".format(param.currency,amount))
+			except Exception:
+				traceback.print_exc()
+				await ml.log("Nope! Example : `{0.prefix} give {1} {2}`. It's possible that this guy doesn't have an account yet.".format(param,"@someone","example"))
+		else:
+			await ml.log("You don't have permissions ._.")
+
 	async def create(text):
-		param = db.get(ServerSettings,{'guild_id' : server.id})
-		account = db.get(BankAccount,{'guild_id' : server.id, 'user_id' : author.id})
+		await ml.log("nice.")
+		param = acc_db.get("settings",server.id)
+		account = acc_db.get(server.id,author.id)
 		if (author.guild_permissions.manage_roles):
 			try:
 				pick = await menu({"1":"Item with Role","2":"Job with role (pay someone to feed a channel)"})
@@ -282,46 +275,58 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					await ml.log(role_id)
 					price = int((await question(lambda m : author == m.author, "Tell me the price ! (don't precise currency)")).content)
 					await ml.log(price)
-					item = Item({"guild_id":server.id, "creator_id": author.id, "name":name, "description": description, "role":role_id, "price":price})
-					await ml.log({"guild_id":server.id, "creator_id": author.id, "name":name, "description": description, "role":role_id, "price":price})
-					item.save(db)
+					
+					if not item_db.collection_exists(server.id):
+						item_db.put_collection(server.id)
+					item = item_db.put(server.id,name,
+					{"guild_id":server.id, 
+					"creator_id": author.id, 
+					"name":name, 
+					"description": description, 
+					"role":role_id, 
+					"price":price})
+					await ml.log(item)
+					item.save()
 				elif (pick == "2"):
 					pass
+				with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
+					item_db.save(ftp_host,"/panama/item_data")
 			except Exception:
 				traceback.print_exc()
-				await ml.log("Nope! Example for a banana that costs 5 : `{0.prefix} banana @role 5`".format(param))
+				await ml.log("Well there was a problem, contact us ;-;".format(param))
 		else:
 			await ml.log("You don't have permissions ._.")
 	
 	
 	async def buy(text):
-		param = db.get(ServerSettings,{'guild_id' : server.id})
-		account = db.get(BankAccount,{'guild_id' : server.id, 'user_id' : author.id})
+		await ml.log("nice.")
+		
+		param = acc_db.get("settings",server.id)
+		account = acc_db.get(server.id, author.id)
 		try:
-			items = db.filter(Item,{'guild_id' : server.id})
+			items = item_db.get_collection(server.id)
 			dic = {}
 			price = {}
-			for item in items:
+			for key in items:
 				description = ""
-				description += "Price : "+param.currency+str(item.price)
-				description += " : "+item.description
-				dic[item.name] = description
-				price[item.name] = item.price
-			pick = await menu(dic)
-			if pick is not None:
-				print(price[item.name])
-				if account.amount > price[item.name]:
-					account.amount -= price[item.name]
-					await author.add_roles(server.get_role(item.role))
+				description += "Price : "+param.currency+str(items[key].price)
+				description += " : "+items[key].description
+				dic[key] = description
+				price[key] = items[key].price
+			picked_key = await menu(dic)
+			
+			if picked_key is not None:
+				print(price[picked_key])
+				if account.amount > price[picked_key]:
+					account["amount"] = price[picked_key] - account.amount
+					await author.add_roles(server.get_role(items[picked_key].role))
 					account.save()
-					db.commit()
-					await ml.log("Have fun with your "+item.name+" ! You got the role now :flushed:")
+					await ml.log("Have fun with your "+items[picked_key].name+" ! You got the role now :flushed:")
 				else:
 					await ml.log("You don't have enough money for this ;-; Be more active in the server !")
 		except Exception:
 			traceback.print_exc()
 			await ml.log("smh".format(param))
-	
 	
 	async def default(text):
 		await ml.log("Command doesn't exist. Use {0} help.".format(param.prefix))
@@ -336,6 +341,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			"help": help,
 			"buy": buy,
 			
+			"set_money":set_money,
 			"create": create,
 			"restart": restart,
 			"settings": settings,
@@ -354,18 +360,18 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			await ml.log("Command doesn't exist, or our index didn't work. Contact us.")
 			
 	else:
-		try:
-			l.log({'guild_id' : server.id, 'user_id' : author.id})
-			account = db.get(BankAccount,{'guild_id' : server.id, 'user_id' : author.id})
-			if (time.time() - account.last_update > param.cooldown):
-				gain = int(random.random()*float(param.variation)/100*float(param.gain))
-				account.amount += gain
-				account.last_update = time.time()
-				account.save()
-		except Document.DoesNotExist:
-			await money(text)
+		account = acc_db.get(server.id, author.id)
+		if not account:
+			await money(account)
+			account = acc_db.get(server.id, author.id)
+		if (time.time() - account.last_update > param.cooldown):
+			gain = int(random.random()*float(param.variation)/100*float(param.gain))
+			account.amount += gain
+			account.last_update = time.time()
+			account.save()
 	lock = False
-	db.commit()
+	with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
+		acc_db.save(ftp_host,"/panama/acc_data")
 
 bot.run(os.environ["PANAMA"])
 # PANAMA TEST https://discord.com/oauth2/authorize?&client_id=802926388235337759&scope=bot&permissions=268553216
