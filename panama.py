@@ -245,8 +245,8 @@ Change with (example) : `{0.prefix} set cooldown 60`
 				list = ftp_host.listdir(ftpDir)
 				for fname in list:
 					if ftp_host.path.isdir(ftpDir + fname):
-						shutil.rmtree(ftpDir + fname)
-						os.mkdir(ftpDir + fname)
+						shutil.rmtree(localDir + fname)
+						os.mkdir(localDir + fname)
 						l.log(ftpDir + fname + " is created.")
 						download_dir(localDir + fname + "/", ftpDir + fname + "/")
 					else:               
