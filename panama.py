@@ -239,17 +239,24 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		await ml.log("nice.")
 	
 	async def load(text):
-		with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp:
-			def download(folder):
-				for item in ftp.walk(folder):
-					l.log("Creating dir " + item[0])
-					os.mkdir(item[0])
-					for subdir in item[1]:
-						l.log("Recursive call for "+subdir)
-						download(ftp.path.join(item[0],subdir))
-					for file in item[2]:
-						l.log(r"Copying File {0} \ {1}".format(item[0], file))
-						ftp.download(ftp.path.join(item[0],file), os.path.join(item[0],file))
+		with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
+			def download_dir(ftpDir, localDir):
+				list = ftp_host.listdir(ftpDir)
+				for fname in list:
+					if ftp_host.path.isdir(ftpDir + fname):             
+						if(os.path.exists(localDir + fname) != True):                   
+							os.mkdir(localDir + fname)
+							l.log(localDir + fname + " is created.")
+						download_dir(ftpDir + fname + "/", localDir + fname + "/")
+					else:               
+						if(ftp_host.download_if_newer(ftpDir + fname, localDir + fname)):
+							l.log(localDir + fname + " is downloaded.")
+						else:
+							l.log(ftpDir + fname + " has already been downloaded.")
+			local_dir = "./db/"
+			ftp_dir = "/panama/db/"
+
+			download_dir(ftp_dir, local_dir)
 		await ml.log("nice.")
 	
 	async def create(text):
