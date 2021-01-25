@@ -7,6 +7,7 @@ bot = commands.Bot(command_prefix=PREFIX)
 import magic_log
 import asyncio
 import os # to restart the bot
+import shutil
 import sys # to restart the bot
 import traceback # because why not
 import time # cooldown
