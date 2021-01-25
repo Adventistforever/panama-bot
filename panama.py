@@ -14,10 +14,9 @@ import random # random
 
 from blitzdb import Document
 from blitzdb import FileBackend
-import ftptool
+import ftputil
 db = FileBackend("./db", {'serializer_class': 'json'})
-a_host = ftptool.FTPHost.connect("ftp-mike1844.alwaysdata.net", user="mike1844_panama", password=os.environ["PANAMA"])
-a_host.current_directory = "/"
+
 
 class ServerSettings(Document):
 	class Meta(Document.Meta):
@@ -219,7 +218,24 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			return None
 	
 	async def save(text):
-		a_host.mirror_to_remote('db', 'db')
+		with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
+			def upload_dir(localDir, ftpDir):
+				list = os.listdir(localDir)
+				for fname in list:
+					if os.path.isdir(localDir + fname):             
+						if(ftp_host.path.exists(ftpDir + fname) != True):                   
+							ftp_host.mkdir(ftpDir + fname)
+							l.log(ftpDir + fname + " is created.")
+						upload_dir(localDir + fname + "/", ftpDir + fname + "/")
+					else:               
+						if(ftp_host.upload_if_newer(localDir + fname, ftpDir + fname)):
+							l.log(ftpDir + fname + " is uploaded.")
+						else:
+							l.log(localDir + fname + " has already been uploaded.")
+			local_dir = "./db"
+			ftp_dir = "/panama/db"
+
+			upload_dir(local_dir, ftp_dir)
 		await ml.log("nice.")
 	
 	async def load(text):
