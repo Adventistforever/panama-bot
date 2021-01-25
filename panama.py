@@ -224,7 +224,8 @@ Change with (example) : `{0.prefix} set cooldown 60`
 				list = os.listdir(localDir)
 				for fname in list:
 					if os.path.isdir(localDir + fname):
-						ftp_host.rmtree(ftpDir + fname)
+						if ftp_host.exists(ftpDir + fname):
+							ftp_host.rmtree(ftpDir + fname)
 						ftp_host.mkdir(ftpDir + fname)
 						l.log(ftpDir + fname + " is created.")
 						upload_dir(localDir + fname + "/", ftpDir + fname + "/")
@@ -245,7 +246,8 @@ Change with (example) : `{0.prefix} set cooldown 60`
 				list = ftp_host.listdir(ftpDir)
 				for fname in list:
 					if ftp_host.path.isdir(ftpDir + fname):
-						shutil.rmtree(localDir + fname)
+						if os.exists(localDir + fname)
+							shutil.rmtree(localDir + fname)
 						os.mkdir(localDir + fname)
 						l.log(ftpDir + fname + " is created.")
 						download_dir(ftpDir + fname + "/", localDir + fname + "/")
