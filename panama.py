@@ -24,21 +24,6 @@ with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.enviro
 	item_db = mikedb.MikeDB.load(ftp_host,"/panama/item_data","items")
 
 
-class ServerSettings(Document):
-	class Meta(Document.Meta):
-		primary_key = 'guild_id' #use the guild_id of the author as the primary key
-
-class BankAccount(Document):
-	def __init__(self, attributes=None, lazy=False, backend=None, autoload=True, db_loader=None):
-		super().__init__(attributes, lazy, backend, autoload, db_loader)
-			
-	class Meta(Document.Meta):
-		collection = 'accounts'
-
-class Item(Document):
-	class Meta(Document.Meta):
-		collection = 'items'
-
 
 
 @bot.event
