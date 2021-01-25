@@ -226,7 +226,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					if os.path.isdir(localDir + fname):
 						if ftp_host.exists(ftpDir + fname):
 							ftp_host.rmtree(ftpDir + fname)
-						ftp_host.mkdir(ftpDir + fname)
+							ftp_host.mkdir(ftpDir + fname)
 						l.log(ftpDir + fname + " is created.")
 						upload_dir(localDir + fname + "/", ftpDir + fname + "/")
 					else:               
@@ -248,7 +248,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					if ftp_host.path.isdir(ftpDir + fname):
 						if os.path.exists(localDir + fname):
 							shutil.rmtree(localDir + fname)
-						os.mkdir(localDir + fname)
+							os.mkdir(localDir + fname)
 						l.log(ftpDir + fname + " is created.")
 						download_dir(ftpDir + fname + "/", localDir + fname + "/")
 					else:               
