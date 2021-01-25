@@ -298,7 +298,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			"create": create,
 			"restart": restart,
 			"settings": settings,
-			"set": set
+			"set": set,
 			
 			"save": save,
 			"load": load
