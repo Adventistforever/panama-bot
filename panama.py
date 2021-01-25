@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+
 import dbm # special message triggers
 PREFIX = "p!"
 bot = commands.Bot(command_prefix=PREFIX)
@@ -13,7 +14,9 @@ import random # random
 
 from blitzdb import Document
 from blitzdb import FileBackend
+import ftptool
 db = FileBackend("./db", {'serializer_class': 'json'})
+a_host = ftptool.FTPHost.connect("ftp-mike1844.alwaysdata.net", user="mike1844_panama", password=os.environ["PANAMA"])
 
 class ServerSettings(Document):
 	class Meta(Document.Meta):
@@ -213,7 +216,15 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		except asyncio.TimeoutError:
 			await channel.send('bruh. too late')
 			return None
-		
+	
+	async def save(text):
+		a_host.mirror_to_remote('/db', '/db')
+		await ml.log("nice.")
+	
+	async def load(text):
+		a_host.mirror_to_local('/db', '/db')
+		await ml.log("nice.")
+	
 	async def create(text):
 		param = db.get(ServerSettings,{'guild_id' : server.id})
 		account = db.get(BankAccount,{'guild_id' : server.id, 'user_id' : author.id})
@@ -288,16 +299,18 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			"restart": restart,
 			"settings": settings,
 			"set": set
+			
+			"save": save,
+			"load": load
 		}
 		
 		all_commands = default_commands
 		
 		text = text.split(" ")
 		try:
-			l.force_p(all_commands[text[1]])
 			await all_commands.get(text[1],default)(text)
 		except KeyError:
-			await ml.log("Our index didn't work. Contact us.")
+			await ml.log("Command doesn't exist, or our index didn't work. Contact us.")
 			
 	else:
 		try:

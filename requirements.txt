@@ -1,2 +1,3 @@
 discord.py
 blitzdb
+ftptool
