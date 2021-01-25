@@ -223,7 +223,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			def upload_dir(localDir, ftpDir):
 				list = os.listdir(localDir)
 				ftp_host.rmtree(ftpDir)
-				ftp_host.mkdir(ftpDir)
+				ftp_host.mkdir(ftpDir[:-1])
 				for fname in list:
 					if os.path.isdir(localDir + fname):             
 						if(ftp_host.path.exists(ftpDir + fname) != True):                   
