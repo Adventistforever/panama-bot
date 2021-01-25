@@ -219,11 +219,11 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			return None
 	
 	async def save(text):
-		a_host.mirror_to_remote('/db', './db')
+		a_host.mirror_to_remote('db', 'db')
 		await ml.log("nice.")
 	
 	async def load(text):
-		a_host.mirror_to_local('/db', './db')
+		a_host.mirror_to_local('db', 'db')
 		await ml.log("nice.")
 	
 	async def create(text):
