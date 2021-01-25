@@ -222,8 +222,9 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
 			def upload_dir(localDir, ftpDir):
 				list = os.listdir(localDir)
-				ftp_host.rmtree(ftpDir)
-				ftp_host.mkdir(ftpDir[:-1])
+				if ftp_host.path.exists(ftpDir):
+					ftp_host.rmtree(ftpDir)
+					ftp_host.mkdir(ftpDir[:-1])
 				for fname in list:
 					if os.path.isdir(localDir + fname):             
 						if(ftp_host.path.exists(ftpDir + fname) != True):                   
@@ -245,8 +246,9 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
 			def download_dir(ftpDir, localDir):
 				list = ftp_host.listdir(ftpDir)
-				shutil.rmtree(localDir)
-				os.mkdir(localDir[:-1])
+				if (os.path.exists(localDir)):
+					shutil.rmtree(localDir)
+					os.mkdir(localDir[:-1])
 				for fname in list:
 					if ftp_host.path.isdir(ftpDir + fname):             
 						if(os.path.exists(localDir + fname) != True):                   
