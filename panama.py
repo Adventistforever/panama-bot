@@ -6,7 +6,8 @@ PREFIX = "p!"
 bot = commands.Bot(command_prefix=PREFIX)
 import magic_log
 import asyncio
-import os # to restart the bot
+import os 
+import shutil
 import sys # to restart the bot
 import traceback # because why not
 import time # cooldown
@@ -244,7 +245,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 				list = ftp_host.listdir(ftpDir)
 				for fname in list:
 					if ftp_host.path.isdir(ftpDir + fname):
-						os.rmtree(ftpDir + fname)
+						shutil.rmtree(ftpDir + fname)
 						os.mkdir(ftpDir + fname)
 						l.log(ftpDir + fname + " is created.")
 						download_dir(localDir + fname + "/", ftpDir + fname + "/")
