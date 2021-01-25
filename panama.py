@@ -222,10 +222,10 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			def upload_dir(localDir, ftpDir):
 				list = os.listdir(localDir)
 				for fname in list:
-					if os.path.isdir(localDir + fname):             
-						if(ftp_host.path.exists(ftpDir + fname) != True):                   
-							ftp_host.mkdir(ftpDir + fname)
-							l.log(ftpDir + fname + " is created.")
+					if os.path.isdir(localDir + fname):
+						ftp_host.rmtree(ftpDir + fname)
+						ftp_host.mkdir(ftpDir + fname)
+						l.log(ftpDir + fname + " is created.")
 						upload_dir(localDir + fname + "/", ftpDir + fname + "/")
 					else:               
 						if(ftp_host.upload_if_newer(localDir + fname, ftpDir + fname)):
@@ -243,11 +243,11 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			def download_dir(ftpDir, localDir):
 				list = ftp_host.listdir(ftpDir)
 				for fname in list:
-					if ftp_host.path.isdir(ftpDir + fname):             
-						if(os.path.exists(localDir + fname) != True):                   
-							os.mkdir(localDir + fname)
-							l.log(localDir + fname + " is created.")
-						download_dir(ftpDir + fname + "/", localDir + fname + "/")
+					if ftp_host.path.isdir(ftpDir + fname):
+						os.rmtree(ftpDir + fname)
+						os.mkdir(ftpDir + fname)
+						l.log(ftpDir + fname + " is created.")
+						download_dir(localDir + fname + "/", ftpDir + fname + "/")
 					else:               
 						if(ftp_host.download_if_newer(ftpDir + fname, localDir + fname)):
 							l.log(localDir + fname + " is downloaded.")
