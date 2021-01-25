@@ -239,7 +239,17 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		await ml.log("nice.")
 	
 	async def load(text):
-		a_host.mirror_to_local('db', 'db')
+		with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp:
+			def download(folder):
+				for item in ftp.walk(folder):
+					l.log("Creating dir " + item[0])
+					os.mkdir(item[0])
+					for subdir in item[1]:
+						l.log("Recursive call for "+subdir)
+						download(ftp.path.join(item[0],subdir))
+					for file in item[2]:
+						l.log(r"Copying File {0} \ {1}".format(item[0], file))
+						ftp.download(ftp.path.join(item[0],file), os.path.join(item[0],file))
 		await ml.log("nice.")
 	
 	async def create(text):
