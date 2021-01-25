@@ -246,7 +246,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			def download_dir(ftpDir, localDir):
 				list = ftp_host.listdir(ftpDir)
 				shutil.rmtree(localDir)
-				os.mkdir(localDir)
+				os.mkdir(localDir[:-1])
 				for fname in list:
 					if ftp_host.path.isdir(ftpDir + fname):             
 						if(os.path.exists(localDir + fname) != True):                   
