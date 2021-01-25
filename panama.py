@@ -248,7 +248,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 						shutil.rmtree(localDir + fname)
 						os.mkdir(localDir + fname)
 						l.log(ftpDir + fname + " is created.")
-						download_dir(localDir + fname + "/", ftpDir + fname + "/")
+						download_dir(ftpDir + fname + "/", localDir + fname + "/")
 					else:               
 						if(ftp_host.download_if_newer(ftpDir + fname, localDir + fname)):
 							l.log(localDir + fname + " is downloaded.")
