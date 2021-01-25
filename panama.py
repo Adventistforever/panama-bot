@@ -233,7 +233,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 						else:
 							l.log(localDir + fname + " has already been uploaded.")
 			local_dir = "./db"
-			ftp_dir = "/panama/db"
+			ftp_dir = "/panama/db/"
 
 			upload_dir(local_dir, ftp_dir)
 		await ml.log("nice.")
