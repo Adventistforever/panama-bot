@@ -13,15 +13,16 @@ import traceback # because why not
 import time # cooldown
 import random # random
 
-import mikedb
+import podoks
 import ftputil
 import pickle
 # from blitzdb import Document
 # from blitzdb import FileBackend
 # db = FileBackend("./db", {'serializer_class': 'json'})
 with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
-	acc_db = mikedb.MikeDB.load(ftp_host,"/panama/acc_data","account_and_server_settings")
-	item_db = mikedb.MikeDB.load(ftp_host,"/panama/item_data","items")
+	acc_db = podoks.Instance.load(ftp_host,"/panama/acc_data","account_and_server_settings")
+	item_db = podoks.Instance.load(ftp_host,"/panama/item_data","items")
+	job_db = podoks.Instance.load(ftp_host,"/panama/job_data","jobs")
 
 
 
@@ -34,7 +35,7 @@ lock = False
 @bot.event
 async def on_message(message):
 	global lock
-	l = magic_log.NoLog()
+	l = magic_log.Print()
 	ml = magic_log.MessageLog()
 	l.log(message.content)
 
@@ -54,8 +55,8 @@ async def on_message(message):
 	
 	try:
 		param = acc_db.get("settings",server.id)
-	except mikedb.NoSuchCollectionError:
-		acc_db.put_collection("settings")
+	except podoks.NoSuchCollectionError:
+		acc_db.create_collection("settings")
 		param = None
 	if not param :
 		param = acc_db.put("settings",server.id,
@@ -67,7 +68,6 @@ async def on_message(message):
 		"variation":20,
 		"cooldown":30
 		})
-	l.log(acc_db)
 		
 	async def ping(text):
 		await ml.log("teehee !")
@@ -82,8 +82,8 @@ async def on_message(message):
 		
 		try:
 			account = acc_db.get(server.id,author.id)
-		except mikedb.NoSuchCollectionError:
-			acc_db.put_collection(server.id)
+		except podoks.NoSuchCollectionError:
+			acc_db.create_collection(server.id)
 			account = None
 		
 		if not account:
@@ -111,10 +111,15 @@ async def on_message(message):
 		await ml.log("""
 ```YOU GET MONEY FROM CHATTING HERE.```
 ```BASICS```
+
+**Check if bot is online** : `{0.prefix} ping`
+
 **Check how rich you are** : `{0.prefix} me`
 **Check how rich someone is** : `{0.prefix} see @someone`
-**Check if bot is online** : `{0.prefix} ping`
+
 **Buy epic stuff** : `{0.prefix} buy`
+**Get a job and get rich quicker** : `{0.prefix} work`
+
 ```EXCHANGE MONEY```
 **Give money** : `{0.prefix} give @someone 10`
 ```MOD```
@@ -161,7 +166,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		try:
 			fellow_acc = acc_db.get(server.id, message.mentions[0].id)
 			if not fellow_acc:
-				fellow_acc = acc_db.put(server.id,author.id,{
+				fellow_acc = acc_db.put(server.id,message.mentions[0].id,{
 					"guild_id":server.id,
 					"user_id":author.id,
 					"amount":int(param.default_amount),
@@ -249,10 +254,10 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		account = acc_db.get(server.id,author.id)
 		if (author.guild_permissions.manage_roles):
 			try:
-				pick = await menu({"1":"Item with Role","2":"Job with role (pay someone to feed a channel)"})
+				pick = await menu({"1":"Item with Role","2":"Job with role (pay someone to feed a channel, only one job per channel)"})
 				await ml.log(pick)
 				if (pick == "1"):
-					name = (await question(lambda m : author == m.author, "Alr, What's the name ?")).content
+					name = (await question(lambda m : author == m.author, "Alr, What's the name ? (ONE WORD)")).content
 					await ml.log(name)
 					description = (await question(lambda m : author == m.author, "Describe what it's about.")).content
 					await ml.log(description)
@@ -262,7 +267,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					await ml.log(price)
 					
 					if not item_db.collection_exists(server.id):
-						item_db.put_collection(server.id)
+						item_db.create_collection(server.id)
 					item = item_db.put(server.id,name,
 					{"guild_id":server.id, 
 					"creator_id": author.id, 
@@ -272,16 +277,66 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					"price":price})
 					await ml.log(item)
 					item.save()
+					
+					with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
+						item_db.save(ftp_host,"/panama/item_data")
 				elif (pick == "2"):
-					pass
-				with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
-					item_db.save(ftp_host,"/panama/item_data")
+					name = (await question(lambda m : author == m.author, "Alr, What's the name ? (ONE WORD)")).content
+					await ml.log(name)
+					description = (await question(lambda m : author == m.author, "Describe what it's about.")).content
+					await ml.log(description)
+					role_id = (await question(lambda m : author == m.author, "Now, what's the role ? Ping it-")).role_mentions[0].id
+					await ml.log(role_id)
+					channel_id = (await question(lambda m : author == m.author, "Now, what's the channel ? Mention it-")).channel_mentions[0].id
+					await ml.log(channel_id)
+					gain = int((await question(lambda m : author == m.author, "Tell me the gain every message ! (don't precise currency)")).content)
+					await ml.log(gain)
+					
+					if not job_db.collection_exists(server.id):
+						job_db.create_collection(server.id)
+					job = job_db.put(server.id,channel_id,
+					{"guild_id":server.id, 
+					"creator_id": author.id, 
+					"name":name, 
+					"description": description, 
+					"role":role_id,
+					"channel":channel_id,
+					"gain":gain})
+					await ml.log(job)
+					job.save()
+					with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
+						job_db.save(ftp_host,"/panama/job_data")
+				
 			except Exception:
 				traceback.print_exc()
 				await ml.log("Well there was a problem, contact us ;-;".format(param))
 		else:
 			await ml.log("You don't have permissions ._.")
 	
+	async def work(text):
+		await ml.log("nice.")
+		l.log(job_db)
+		param = acc_db.get("settings",server.id)
+		account = acc_db.get(server.id, author.id)
+		try:
+			jobs = job_db.get_collection(server.id)
+			dic = {}
+			role = {}
+			for key in jobs:
+				description = ""
+				description += jobs[key]["description"]
+				description += "... you'll be payed more to use "+server.get_channel(jobs[key].channel).mention
+				dic[jobs[key].name] = description
+				role[jobs[key].name] = jobs[key].role
+			picked_key = await menu(dic)
+			
+			if picked_key is not None:
+				print(role[picked_key])
+				await author.add_roles(server.get_role(role[picked_key]))
+				await ml.log("Have fun with your "+picked_key+" job ! You got the role now :flushed:")
+		except Exception:
+			traceback.print_exc()
+			await ml.log("smh".format(param))
 	
 	async def buy(text):
 		await ml.log("nice.")
@@ -303,7 +358,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			if picked_key is not None:
 				print(price[picked_key])
 				if account.amount > price[picked_key]:
-					account["amount"] = price[picked_key] - account.amount
+					account["amount"] = account.amount - price[picked_key]
 					await author.add_roles(server.get_role(items[picked_key].role))
 					account.save()
 					await ml.log("Have fun with your "+items[picked_key].name+" ! You got the role now :flushed:")
@@ -319,21 +374,22 @@ Change with (example) : `{0.prefix} set cooldown 60`
 	if (text.startswith(param.prefix)):
 		
 		default_commands = {
-			"ping": ping,
 			"me": money,
 			"see": money_other,
 			"give": give,
 			"help": help,
+			
 			"buy": buy,
+			"work": work,
 			
 			"set_money":set_money,
+			"set": set,
+			
 			"create": create,
 			"restart": restart,
 			"settings": settings,
-			"set": set,
 			
-			"save": save,
-			"load": load
+			"ping": ping
 		}
 		
 		all_commands = default_commands
@@ -345,15 +401,31 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			await ml.log("Command doesn't exist, or our index didn't work. Contact us.")
 			
 	else:
-		account = acc_db.get(server.id, author.id)
+		try:
+			account = acc_db.get(server.id, author.id)
+		except podoks.NoSuchCollectionError:
+			acc_db.create_collection(server.id)
+			account = None
+			
 		if not account:
 			await money(account)
 			account = acc_db.get(server.id, author.id)
+		
 		if (time.time() - account.last_update > param.cooldown):
 			gain = int(random.random()*float(param.variation)/100*float(param.gain))
-			account.amount += gain
-			account.last_update = time.time()
+			account["amount"] = account["amount"] + gain
+			account["last_update"] = time.time()
 			account.save()
+		
+		try:
+			if job_db.get(server.id,channel.id) is not None :
+				job = job_db.get(server.id,channel.id)
+				if server.get_role(job["role"]) in author.roles:
+					account["amount"] = account["amount"] + job["gain"]
+					account.save()
+		except podoks.NoSuchCollectionError:
+			pass
+
 	lock = False
 	with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
 		acc_db.save(ftp_host,"/panama/acc_data")
