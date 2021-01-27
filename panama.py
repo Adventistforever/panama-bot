@@ -25,6 +25,13 @@ with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.enviro
 	job_db = podoks.Instance.load(ftp_host,"/panama/job_data","jobs")
 
 
+cute_pics = [
+"https://cdn.discordapp.com/attachments/803913660224897098/803927553215168542/12c7e3fbd20c117452ab1b4e1ba2b5ff.png",
+"https://cdn.discordapp.com/attachments/803913660224897098/803927553533542471/d97dcaa6eee659482550ed01df76a0e3.png",
+"https://cdn.discordapp.com/attachments/803913660224897098/803927553832124426/d5302714818ed0dd9a087a27ad69d2f7.png",
+"https://cdn.discordapp.com/attachments/803913660224897098/803927552992608276/af262e20fbd5faec7b28f51a845412b4.png",
+"https://cdn.discordapp.com/attachments/803913660224897098/803927552716570654/4cc9b2d0d69a90b0b5ee85a35de227b3.png"
+]
 
 
 @bot.event
@@ -71,7 +78,7 @@ async def on_message(message):
 		
 	async def ping(text):
 		await ml.log("teehee !")
-		await ml.log(author.permissions_in(channel))
+		await ml.log(":pleading_face: "+random.choice(cute_pics))
 		
 	async def restart(text):
 		await ml.log("kk, hold on!")
@@ -87,7 +94,7 @@ async def on_message(message):
 			account = None
 		
 		if not account:
-			await ml.log("Welcome to the economy !")
+			await ml.log("Welcome :pleading_face: "+random.choice(cute_pics))
 			account = acc_db.put(server.id,author.id,{
 				"guild_id":server.id,
 				"user_id":author.id,
