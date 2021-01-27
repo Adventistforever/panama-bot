@@ -118,7 +118,7 @@ async def on_message(message):
 **Check how rich someone is** : `{0.prefix} see @someone`
 
 **Buy epic stuff** : `{0.prefix} buy`
-**Get a job and get rich quicker** : `{0.prefix} work`
+**Accept a mission (get more quicker)** : `{0.prefix} mission`
 
 ```EXCHANGE MONEY```
 **Give money** : `{0.prefix} give @someone 10`
@@ -184,7 +184,8 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		except Exception:
 			traceback.print_exc()
 			await ml.log("Nope! Example : `{0.prefix} give {1} {2}`. It's possible that your friend doesn't have an account yet.".format(param,"@someone","example"))
-	
+
+
 	async def menu(dic):
 		# dic format
 		# {option: description}
@@ -254,7 +255,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		account = acc_db.get(server.id,author.id)
 		if (author.guild_permissions.manage_roles):
 			try:
-				pick = await menu({"1":"Item with Role","2":"Job with role (pay someone to feed a channel, only one job per channel)"})
+				pick = await menu({"1":"Item with Role","2":"Mission with role (pay someone to feed a channel, only one job per channel)"})
 				await ml.log(pick)
 				if (pick == "1"):
 					name = (await question(lambda m : author == m.author, "Alr, What's the name ? (ONE WORD)")).content
@@ -380,7 +381,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			"help": help,
 			
 			"buy": buy,
-			"work": work,
+			"mission": work,
 			
 			"set_money":set_money,
 			"set": set,
