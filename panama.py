@@ -26,11 +26,11 @@ with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.enviro
 
 
 cute_pics = [
-"https://cdn.discordapp.com/attachments/803913660224897098/803927553215168542/12c7e3fbd20c117452ab1b4e1ba2b5ff.png",
-"https://cdn.discordapp.com/attachments/803913660224897098/803927553533542471/d97dcaa6eee659482550ed01df76a0e3.png",
-"https://cdn.discordapp.com/attachments/803913660224897098/803927553832124426/d5302714818ed0dd9a087a27ad69d2f7.png",
-"https://cdn.discordapp.com/attachments/803913660224897098/803927552992608276/af262e20fbd5faec7b28f51a845412b4.png",
-"https://cdn.discordapp.com/attachments/803913660224897098/803927552716570654/4cc9b2d0d69a90b0b5ee85a35de227b3.png"
+"https://i.imgur.com/nNx9MYb.png",
+"https://i.imgur.com/J7wk90W.png",
+"https://i.imgur.com/seGAtjP.png",
+"https://i.imgur.com/lhuCPTF.png",
+"https://i.imgur.com/LCSTjFf.png"
 ]
 
 
