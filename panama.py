@@ -30,7 +30,11 @@ cute_pics = [
 "https://i.imgur.com/J7wk90W.png",
 "https://i.imgur.com/seGAtjP.png",
 "https://i.imgur.com/lhuCPTF.png",
-"https://i.imgur.com/LCSTjFf.png"
+"https://i.imgur.com/LCSTjFf.png",
+"https://i.imgur.com/lEhFnGj.jpg",
+"https://i.imgur.com/uDGPjmz.jpg",
+"https://i.imgur.com/Vk20HsG.jpg",
+"https://i.imgur.com/gxV67Ri.jpg"
 ]
 
 
