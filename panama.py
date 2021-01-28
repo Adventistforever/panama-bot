@@ -98,7 +98,7 @@ async def on_message(message):
 			account = None
 		
 		if not account:
-			await ml.log("Welcome :pleading_face: "+random.choice(cute_pics))
+			await ml.log("Welcome :pleading_face: \n"+random.choice(cute_pics))
 			account = acc_db.put(server.id,author.id,{
 				"guild_id":server.id,
 				"user_id":author.id,
@@ -107,7 +107,7 @@ async def on_message(message):
 			})
 
 		l.log(account)
-		await ml.log("You have {1.currency}{0.amount}".format(account,param))
+		await ml.log("You have {1.currency}{0.amount} ! Check out `pan shop` !".format(account,param))
 		
 	async def money_other(text):
 		param = acc_db.get("settings",server.id)
