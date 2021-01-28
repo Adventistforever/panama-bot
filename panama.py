@@ -204,6 +204,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		
 		text = ""
 		for option in dic:
+			text += "\n~"
 			text += "\n**Send** `{0}`, for this : {1}".format(option, dic[option])
 		
 		await ml.log(text)
@@ -391,6 +392,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			"give": give,
 			"help": help,
 			
+			"shop": buy,
 			"buy": buy,
 			"mission": work,
 			
