@@ -98,7 +98,7 @@ async def on_message(message):
 			account = None
 		
 		if not account:
-			await ml.log("Welcome :pleading_face: \n"+random.choice(cute_pics))
+			await ml.log("Your account has been created on Panama Economy. \n"+random.choice(cute_pics))
 			account = acc_db.put(server.id,author.id,{
 				"guild_id":server.id,
 				"user_id":author.id,
