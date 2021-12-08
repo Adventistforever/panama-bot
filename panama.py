@@ -388,6 +388,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		
 		default_commands = {
 			"me": money,
+			"money": money,
 			"see": money_other,
 			"give": give,
 			"help": help,
@@ -395,6 +396,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			"shop": buy,
 			"buy": buy,
 			"mission": work,
+			"job": work,
 			
 			"set_money":set_money,
 			"set": set,
