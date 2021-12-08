@@ -418,8 +418,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		try:
 			account = acc_db.get(server.id, author.id)
 		except podoks.NoSuchCollectionError:
-			acc_db.create
-			_collection(server.id)
+			acc_db.create_collection(server.id)
 			account = None
 			
 		if not account:
