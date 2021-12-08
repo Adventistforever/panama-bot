@@ -292,7 +292,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					item.save()
 					
 					with ftputil.FTPHost("ftp-ftpmike1844.alwaysdata.net", "ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
-						item_db.save(ftp_host,"/panama/item_data")
+						item_db.save(ftp_host,"/item_data")
 				elif (pick == "2"):
 					name = (await question(lambda m : author == m.author, "Alr, What's the name ? (ONE WORD)")).content
 					await ml.log(name)
@@ -318,7 +318,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					await ml.log(job)
 					job.save()
 					with ftputil.FTPHost("ftp-ftpmike1844.alwaysdata.net", "ftp-ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
-						job_db.save(ftp_host,"/panama/job_data")
+						job_db.save(ftp_host,"/job_data")
 				
 			except Exception:
 				traceback.print_exc()
@@ -418,7 +418,8 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		try:
 			account = acc_db.get(server.id, author.id)
 		except podoks.NoSuchCollectionError:
-			acc_db.create_collection(server.id)
+			acc_db.create
+			_collection(server.id)
 			account = None
 			
 		if not account:
@@ -442,7 +443,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 
 	lock = False
 	with ftputil.FTPHost("ftp-ftpmike1844.alwaysdata.net", "ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
-		acc_db.save(ftp_host,"/panama/acc_data")
+		acc_db.save(ftp_host,"/acc_data")
 
 bot.run(os.environ["PANAMA"])
 # PANAMA TEST https://discord.com/oauth2/authorize?&client_id=802926388235337759&scope=bot&permissions=268553216
