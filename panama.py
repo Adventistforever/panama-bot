@@ -412,6 +412,9 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		try:
 			await all_commands.get(text[1],default)(text)
 		except KeyError:
+			await ml.log(text[1])
+			await ml.log(text)
+			await ml.log(all_commands)
 			await ml.log("Command doesn't exist, or our index didn't work. Contact us.")
 			
 	else:
