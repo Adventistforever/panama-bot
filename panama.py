@@ -19,7 +19,7 @@ import pickle
 # from blitzdb import Document
 # from blitzdb import FileBackend
 # db = FileBackend("./db", {'serializer_class': 'json'})
-with ftputil.FTPHost("ftpmike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
+with ftputil.FTPHost("ftpmike1844.alwaysdata.net", "ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
 	acc_db = podoks.Instance.load(ftp_host,"/panama/acc_data","account_and_server_settings")
 	item_db = podoks.Instance.load(ftp_host,"/panama/item_data","items")
 	job_db = podoks.Instance.load(ftp_host,"/panama/job_data","jobs")
