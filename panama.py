@@ -362,8 +362,8 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			price = {}
 			for key in items:
 				description = ""
-				description += "Price : "+param.currency+str(items[key].price)
-				description += " : "+items[key].description
+				description += items[key].description
+				description += " ; Price : "+param.currency+str(items[key].price)
 				dic[key] = description
 				price[key] = items[key].price
 			picked_key = await menu(dic)
