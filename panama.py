@@ -291,7 +291,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					await ml.log(item)
 					item.save()
 					
-					with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
+					with ftputil.FTPHost("ftp-ftpmike1844.alwaysdata.net", "ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
 						item_db.save(ftp_host,"/panama/item_data")
 				elif (pick == "2"):
 					name = (await question(lambda m : author == m.author, "Alr, What's the name ? (ONE WORD)")).content
@@ -317,7 +317,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					"gain":gain})
 					await ml.log(job)
 					job.save()
-					with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
+					with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
 						job_db.save(ftp_host,"/panama/job_data")
 				
 			except Exception:
@@ -441,7 +441,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			pass
 
 	lock = False
-	with ftputil.FTPHost("ftp-mike1844.alwaysdata.net", "mike1844_panama", os.environ["PANAMA"]) as ftp_host:
+	with ftputil.FTPHost("ftp-ftpmike1844.alwaysdata.net", "ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
 		acc_db.save(ftp_host,"/panama/acc_data")
 
 bot.run(os.environ["PANAMA"])
