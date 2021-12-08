@@ -428,7 +428,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			await money(account)
 			account = acc_db.get(server.id, author.id)
 		
-		if (time.time() - account.last_update > param.cooldown):
+		if (time.time() - account.last_update > int(param.cooldown)):
 			gain = int(random.random()*float(param.variation)/100*float(param.gain))
 			account["amount"] = account["amount"] + gain
 			account["last_update"] = time.time()
