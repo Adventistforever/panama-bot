@@ -317,7 +317,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					"gain":gain})
 					await ml.log(job)
 					job.save()
-					with ftputil.FTPHost("ftp-ftpmike1844.alwaysdata.net", "ftp-ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
+					with ftputil.FTPHost("ftp-ftpmike1844.alwaysdata.net", "ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
 						job_db.save(ftp_host,"/job_data")
 				
 			except Exception:
