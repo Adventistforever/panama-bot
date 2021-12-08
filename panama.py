@@ -154,7 +154,7 @@ Change with (example) : `{0.prefix} set default_amount 100`
 Change with (example) : `{0.prefix} set gain 100`
 **Gain variation** : {0.variation}%
 Change with (example) : `{0.prefix} set variation 25`
-**Cooldown (seconds)** : {0.cooldown}%
+**Cooldown (seconds)** : {0.cooldown}s
 Change with (example) : `{0.prefix} set cooldown 60`
 		""".format(param))
 		
