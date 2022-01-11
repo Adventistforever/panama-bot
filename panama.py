@@ -429,11 +429,14 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		if not account:
 			await money(account)
 			account = acc_db.get(server.id, author.id)
-		
+		ml.log(time.time())
+		ml.log(account.last_update)
+		ml.log(int(param.cooldown))
 		if (time.time() - account.last_update > int(param.cooldown)):
 			gain = int(random.random()*float(param.variation)/100*float(param.gain))
 			account["amount"] = account["amount"] + gain
 			account["last_update"] = time.time()
+			ml.log(gain)
 			account.save()
 		
 		try:
