@@ -435,11 +435,11 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		l.log(account.last_update)
 		l.log(int(param.cooldown))
 		if (time.time() - account.last_update > int(param.cooldown)):
-			await ml.log("add")
+			l.log("add")
 			gain = int (int(param.gain) + (float(param.variation)/100 * float(param.gain) * random.random() * 2  - 1))
 			account["amount"] = account["amount"] + gain
 			account["last_update"] = time.time()
-			await ml.log(gain)
+			l.log(gain)
 			account.save()
 		
 		try:
