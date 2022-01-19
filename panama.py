@@ -430,10 +430,10 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			await money(account)
 			account = acc_db.get(server.id, author.id)
 		
-		await ml.log("automatic gain for every message check");
-		await ml.log(time.time())
-		await ml.log(account.last_update)
-		await ml.log(int(param.cooldown))
+		l.log("automatic gain for every message check");
+		l.log(time.time())
+		l.log(account.last_update)
+		l.log(int(param.cooldown))
 		if (time.time() - account.last_update > int(param.cooldown)):
 			await ml.log("add");
 			gain = int(random.random()*float(param.variation)/100*float(param.gain))
