@@ -129,6 +129,7 @@ async def on_message(message):
 **Check how rich someone is** : `{0.prefix} see @someone`
 
 **Buy epic stuff** : `{0.prefix} buy`
+**Eat {0.currency} 😋** : `{0.prefix} eat 10`
 **Accept a mission (get more quicker)** : `{0.prefix} mission`
 
 ```EXCHANGE MONEY```
@@ -170,6 +171,16 @@ Change with (example) : `{0.prefix} set cooldown 60`
 				await ml.log("Nope! Example : `{0.prefix} set {1} 100`".format(param,"example"))
 		else:
 			await ml.log("You don't have permissions ._.")
+	
+	async def eat(text):
+		param = acc_db.get("settings",server.id)
+		account = acc_db.get(server.id, author.id)
+		amount = [int(i) for i in text if i.isdigit()][0]
+		l.force_p(amount)
+		account["amount"] -= int(amount)
+		account.save()
+		await ml.log("you ate {1}{0} !".format(param.currency, amount))
+			
 	
 	async def give(text):
 		param = acc_db.get("settings",server.id)
@@ -397,6 +408,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			"buy": buy,
 			"mission": work,
 			"job": work,
+			"eat": eat,
 			
 			"set_money":set_money,
 			"set": set,
