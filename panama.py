@@ -271,7 +271,110 @@ Change with (example) : `{0.prefix} set cooldown 60`
 				await ml.log("Nope! Example : `{0.prefix} give {1} {2}`. It's possible that this guy doesn't have an account yet.".format(param,"@someone","example"))
 		else:
 			await ml.log("You don't have permissions ._.")
-
+	
+	async def edit(text):
+		await ml.log("nice, edit.")
+		param = acc_db.get("settings",server.id)
+		account = acc_db.get(server.id,author.id)
+		if (author.guild_permissions.manage_roles):
+			try:
+				pick = await menu({"1":"Item with Role","2":"Mission with role (pay someone to feed a channel, only one job per channel)"})
+				await ml.log(pick)
+				if (pick == "1"):
+					name = (await question(lambda m : author == m.author, "Alr, What's the name ?")).content
+					await ml.log(name)
+					item = item_db.get(server.id,name)
+					ml.log("send 0 to not modify something.")
+					
+					await ml.log(item.description)
+					description = (await question(lambda m : author == m.author, "Describe what it's about.")).content
+					if description == "0":
+						description = item.description
+					await ml.log(description)
+					
+					await ml.log(item.role_id)
+					role_id = (await question(lambda m : author == m.author, "Now, what's the role ? Ping it-")).role_mentions[0].id
+					if role_id == "0":
+						role_id = item.role_id
+					await ml.log(role_id)
+					
+					await ml.log(item.price)
+					price = int((await question(lambda m : author == m.author, "Tell me the price ! (don't precise currency)")).content)
+					if price == "0":
+						price = item.price
+					await ml.log(price)
+					
+					if not item_db.collection_exists(server.id):
+						item_db.create_collection(server.id)
+					item = item_db.put(server.id,name,
+					{"guild_id":server.id, 
+					"creator_id": author.id, 
+					"name":name, 
+					"description": description, 
+					"role":role_id, 
+					"price":price})
+					await ml.log(item)
+					item.save()
+					
+					with ftputil.FTPHost("ftp-ftpmike1844.alwaysdata.net", "ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
+						item_db.save(ftp_host,"/item_data")
+				elif (pick == "2"):
+					name = (await question(lambda m : author == m.author, "Alr, What's the name ? (ONE WORD)")).content
+					await ml.log(name)
+					
+					await ml.log(name)
+					try :
+						job = job_db.get(server.id,name)
+					except Exception :
+						ml.log(name + " doesn't seem to exist on this server.")
+					ml.log("send 0 to not modify something.")
+					
+					await ml.log(job.description)
+					description = (await question(lambda m : author == m.author, "Describe what it's about.")).content
+					if description == "0":
+						description = job.description
+					await ml.log(description)
+					
+					await ml.log(job.role_id)
+					role_id = (await question(lambda m : author == m.author, "Now, what's the role ? Ping it-")).role_mentions[0].id
+					if role_id == "0":
+						role_id = job.role_id
+					await ml.log(role_id)
+					
+					await ml.log(job.channel_id)
+					channel_id = (await question(lambda m : author == m.author, "Now, what's the channel ? Mention it-")).channel_mentions[0].id
+					if channel_id == "0":
+						channel_id = job.channel_id
+					await ml.log(channel_id)
+					
+					await ml.log(job.gain)
+					gain = int((await question(lambda m : author == m.author, "Tell me the gain every message ! (don't precise currency)")).content)
+					if gain == "0":
+						gain = job.gain
+					await ml.log(gain)
+					
+					if not job_db.collection_exists(server.id):
+						job_db.create_collection(server.id)
+					job = job_db.put(server.id,channel_id,
+					{"guild_id":server.id, 
+					"creator_id": author.id, 
+					"name":name, 
+					"description": description, 
+					"role":role_id,
+					"channel":channel_id,
+					"gain":gain})
+					await ml.log(job)
+					job.save()
+					with ftputil.FTPHost("ftp-ftpmike1844.alwaysdata.net", "ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
+						job_db.save(ftp_host,"/job_data")
+				
+			except Exception:
+				traceback.print_exc()
+				await ml.log("Well there was a problem, contact us ;-;".format(param))
+		else:
+			await ml.log("You don't have permissions ._.")
+	
+	
 	async def create(text):
 		await ml.log("nice.")
 		param = acc_db.get("settings",server.id)
@@ -414,6 +517,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			"set": set,
 			
 			"create": create,
+			"edit": edit,
 			"restart": restart,
 			"settings": settings,
 			
