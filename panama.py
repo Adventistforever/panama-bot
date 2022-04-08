@@ -137,6 +137,7 @@ async def on_message(message):
 ```MOD```
 **Customize your life** `{0.prefix} settings`
 **Create stuff to buy, or jobs** `{0.prefix} create`
+**Modify those stuff** `{0.prefix} edit` and `{0.prefix} delete`
 **Set the money of someone or yourself :joy:** `{0.prefix} set_money @someone`
 		""".format(param))
 	
@@ -272,6 +273,41 @@ Change with (example) : `{0.prefix} set cooldown 60`
 		else:
 			await ml.log("You don't have permissions ._.")
 	
+	async def delete(text):
+		await ml.log("nice, delete.")
+		param = acc_db.get("settings",server.id)
+		account = acc_db.get(server.id,author.id)
+		if (author.guild_permissions.manage_roles):
+			try:
+				pick = await menu({"1":"Item with Role","2":"Mission with role (pay someone to feed a channel, only one job per channel)"})
+				await ml.log(pick)
+				if (pick == "1"):
+					name = (await question(lambda m : author == m.author, "Alr, What's the name ?")).content
+					await ml.log(name)
+					item = item_db.get(server.id,name)
+					await ml.log(item)
+					item_db.delete(server.id,name)
+					await ml.log("Deleted !")
+					
+					with ftputil.FTPHost("ftp-ftpmike1844.alwaysdata.net", "ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
+						item_db.save(ftp_host,"/item_data")
+				elif (pick == "2"):
+					name = (await question(lambda m : author == m.author, "Alr, What's the name ? (ONE WORD)")).content
+					await ml.log(name)
+					job = job_db.get(server.id,name)
+					await ml.log(job)
+					job_db.delete(server.id,name)
+					await ml.log("Deleted !")
+					
+					with ftputil.FTPHost("ftp-ftpmike1844.alwaysdata.net", "ftpmike1844_panama", os.environ["PANAMA"]) as ftp_host:
+						job_db.save(ftp_host,"/job_data")
+			except Exception:
+				traceback.print_exc()
+				await ml.log("Well there was a problem, contact us ;-;".format(param))
+		else:
+			await ml.log("You don't have permissions ._.")
+		
+		
 	async def edit(text):
 		await ml.log("nice, edit.")
 		param = acc_db.get("settings",server.id)
@@ -314,6 +350,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					
 					if not item_db.collection_exists(server.id):
 						item_db.create_collection(server.id)
+					
 					item = item_db.put(server.id,name,
 					{"guild_id":server.id, 
 					"creator_id": author.id, 
@@ -526,6 +563,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 			
 			"create": create,
 			"edit": edit,
+			"delete": delete,
 			"restart": restart,
 			"settings": settings,
 			
