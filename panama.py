@@ -294,8 +294,9 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					await ml.log(description)
 					
 					await ml.log(item.role)
-					role_id = (await question(lambda m : author == m.author, "Now, what's the role ? Ping it-")).role_mentions[0].id
-					if role_id == "0":
+					try :
+						role_id = (await question(lambda m : author == m.author, "Now, what's the role ? Ping it-")).role_mentions[0].id
+					except IndexError : # due to role_mentions
 						role_id = item.role
 					await ml.log(role_id)
 					
