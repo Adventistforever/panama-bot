@@ -108,7 +108,6 @@ class Instance:
 	def delete(self, collection, key):
 		try:
 			del self.data[collection][key]
-			return True
 		except KeyError:
 			raise NoSuchCollectionError("Collection `{0}` doesn't exist in `{1}`.".format(collection,self.name))
 
