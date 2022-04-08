@@ -302,7 +302,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					
 					await ml.log(item.price)
 					price = int((await question(lambda m : author == m.author, "Tell me the price ! (don't precise currency)")).content)
-					if price == "0":
+					if price == 0:
 						price = item.price
 					await ml.log(price)
 					
@@ -351,7 +351,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					
 					await ml.log(job.gain)
 					gain = int((await question(lambda m : author == m.author, "Tell me the gain every message ! (don't precise currency)")).content)
-					if gain == "0":
+					if gain == 0:
 						gain = job.gain
 					await ml.log(gain)
 					
