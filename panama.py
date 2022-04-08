@@ -286,9 +286,15 @@ Change with (example) : `{0.prefix} set cooldown 60`
 					item = item_db.get(server.id,name)
 					await ml.log(item)
 					await ml.log("send 0 to not modify something.")
+					await ml.log("send name to edit the name.")
+					
 					
 					await ml.log(item.description)
 					description = (await question(lambda m : author == m.author, "Describe what it's about.")).content
+					if description == "name":
+						name = (await question(lambda m : author == m.author, "Alr, What's the new name ? (ONE WORD)")).content
+						await ml.log(name)
+						description = (await question(lambda m : author == m.author, "Describe what it's about.")).content
 					if description == "0":
 						description = item.description
 					await ml.log(description)
