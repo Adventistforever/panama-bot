@@ -293,7 +293,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 						description = item.description
 					await ml.log(description)
 					
-					await ml.log(item.role_id)
+					await ml.log(item.role)
 					role_id = (await question(lambda m : author == m.author, "Now, what's the role ? Ping it-")).role_mentions[0].id
 					if role_id == "0":
 						role_id = item.role
@@ -336,7 +336,7 @@ Change with (example) : `{0.prefix} set cooldown 60`
 						description = job.description
 					await ml.log(description)
 					
-					await ml.log(job.role_id)
+					await ml.log(job.role)
 					role_id = (await question(lambda m : author == m.author, "Now, what's the role ? Ping it-")).role_mentions[0].id
 					if role_id == "0":
 						role_id = job.role
